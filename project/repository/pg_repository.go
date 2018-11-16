@@ -54,8 +54,8 @@ func (m *projectRepo) getProjectMembers(projectID models.UUID) ([]models.Member,
 	members := []models.Member{}
 
 	err := m.DB.Table("members").
-		Joins("INNER JOIN assignment on assignment.member_id = members.id WHERE assignment.project_id = ?", projectID).
-		Find(&members).Error
+		Joins("INNER JOIN assignments on assignments.member_id = members.id WHERE assignments.project_id = ?", projectID).
+		Scan(&members).Error
 
 	return members, err
 }

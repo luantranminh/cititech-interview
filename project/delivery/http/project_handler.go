@@ -3,14 +3,16 @@ package http
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/luantranminh/team-management-app/models"
+	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/luantranminh/team-management-app/project"
 )
+
+var validate = validator.New()
 
 // ProjectInfo .
 type ProjectInfo struct {
@@ -26,7 +28,9 @@ type GetProjectResponse struct {
 
 // CreateProjectRequest .
 type CreateProjectRequest struct {
-	Name string `json:"name"`
+	Project struct {
+		Name string `json:"name"`
+	} `json:"project"`
 }
 
 // ProjectHandler .
@@ -36,18 +40,19 @@ type ProjectHandler struct {
 
 // GetByID .
 func (p *ProjectHandler) GetByID(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	defer r.Body.Close()
 
 	projectID := ps.ByName("id")
 
 	projectUUID, err := models.UUIDFromString(projectID)
 	if err != nil {
-		handleError(err, models.ErrorInvalidID, w)
+		models.HandleError(err, models.ErrorInvalidID, http.StatusBadRequest, w)
 		return
 	}
 
 	project, members, err := p.projectUsecase.GetByID(context.Background(), projectUUID)
 	if err != nil {
-		handleError(err, models.ErrorInvalidProject, w)
+		models.HandleError(err, models.ErrorInvalidProject, http.StatusBadRequest, w)
 		return
 	}
 
@@ -61,7 +66,7 @@ func (p *ProjectHandler) GetByID(w http.ResponseWriter, r *http.Request, ps http
 		},
 	)
 	if err != nil {
-		handleError(err, models.ErrorInvalidProject, w)
+		models.HandleError(err, models.ErrorInvalidProject, http.StatusBadRequest, w)
 		return
 	}
 
@@ -75,41 +80,33 @@ func (p *ProjectHandler) Create(w http.ResponseWriter, r *http.Request, ps httpr
 		err = json.NewDecoder(r.Body).Decode(&req)
 	)
 
-	if err != nil {
-		handleError(err, models.ErrorInvalidProject, w)
+	if err := validate.Struct(req); err != nil {
+		models.HandleError(err, models.ErrorInvalidProject, http.StatusBadRequest, w)
 		return
 	}
 
-	project, err := p.projectUsecase.Create(context.Background(), req.Name)
 	if err != nil {
-		handleError(err, models.ErrorInvalidProject, w)
+		models.HandleError(err, models.ErrorInvalidProject, http.StatusBadRequest, w)
+		return
+	}
+
+	project, err := p.projectUsecase.Create(context.Background(), req.Project.Name)
+	if err != nil {
+		models.HandleError(err, models.ErrorInvalidProject, http.StatusBadRequest, w)
 		return
 	}
 
 	info, err := json.Marshal(project)
 	if err != nil {
-		handleError(err, models.ErrorInvalidProject, w)
+		models.HandleError(err, models.ErrorInvalidProject, http.StatusBadRequest, w)
 		return
 	}
 
 	w.Write(info)
 }
 
-func handleError(err error, errorType error, w http.ResponseWriter) {
-	log.Println(err)
-
-	e := models.Error{
-		Err:  errorType.Error(),
-		Code: http.StatusBadRequest,
-	}
-
-	b, _ := json.Marshal(e)
-	w.Write(b)
-}
-
 // NewProjectHTTPHandler .
 func NewProjectHTTPHandler(pju project.Usecase) ProjectHandler {
 	handler := ProjectHandler{projectUsecase: pju}
-
 	return handler
 }

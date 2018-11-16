@@ -8,6 +8,6 @@ import (
 
 // Usecase .
 type Usecase interface {
-	Create(ctx context.Context, name, phone string) (models.Member, error)
-	AssignToProject(ctx context.Context, memberID models.UUID, projectID models.UUID) bool
+	Create(ctx context.Context, name, phone string) (*models.Member, error)
+	AssignToProject(ctx context.Context, memberID models.UUID, projectID models.UUID) error
 }

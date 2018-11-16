@@ -19,11 +19,11 @@ func NewMemberUsecase(m member.Repository) member.Usecase {
 }
 
 // Create function  present for create a user in business layer
-func (m memberUsecase) Create(ctx context.Context, name, phone string) (models.Member, error) {
+func (m memberUsecase) Create(ctx context.Context, name, phone string) (*models.Member, error) {
 	return m.memberRepos.Create(ctx, name, phone)
 }
 
 // AssignToProject function  present for action 'assign a member to project' in business layer
-func (m memberUsecase) AssignToProject(ctx context.Context, memberID models.UUID, projectID models.UUID) bool {
+func (m memberUsecase) AssignToProject(ctx context.Context, memberID models.UUID, projectID models.UUID) error {
 	return m.memberRepos.AssignToProject(ctx, memberID, projectID)
 }
