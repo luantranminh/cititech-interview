@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/luantranminh/team-management-app/config/database/pg"
 	memberHTTPDeliver "github.com/luantranminh/team-management-app/member/delivery/http"
@@ -17,7 +20,15 @@ import (
 
 func main() {
 
-	pgDB, closeDB := pg.New(`user=postgres dbname=team sslmode=disable password=postgres host=localhost port=5432`)
+	// setup env on local
+	if os.Getenv("ENV") == "local" {
+		err := godotenv.Load()
+		if err != nil {
+			panic(fmt.Sprintf("failed to load .env by errors: %v", err))
+		}
+	}
+
+	pgDB, closeDB := pg.New(os.Getenv("DATA_SOURCE"))
 
 	projectRepo := p.NewProjectRepository(pgDB)
 	projectUsecase := pu.NewProjectUsecase(projectRepo)

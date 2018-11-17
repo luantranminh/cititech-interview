@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/jinzhu/gorm"
 	dbtest "github.com/luantranminh/team-management-app/config/database/pg/util"
 	"github.com/luantranminh/team-management-app/models"
 )
@@ -62,16 +61,18 @@ func Test_projectRepo_Create(t *testing.T) {
 }
 
 func Test_projectRepo_GetByID(t *testing.T) {
-	type fields struct {
-		DB *gorm.DB
+	t.Parallel()
+	testDB, _, cleanup := dbtest.CreateTestDatabase(t)
+	defer cleanup()
+	err := dbtest.MigrateTables(testDB)
+	if err != nil {
+		t.Fatalf("Failed to migrate table by error %v", err)
 	}
 	type args struct {
-		ctx context.Context
-		id  models.UUID
+		id models.UUID
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		want    *models.Project
 		want1   []models.Member
@@ -82,9 +83,9 @@ func Test_projectRepo_GetByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			m := &projectRepo{
-				DB: tt.fields.DB,
+				DB: testDB,
 			}
-			got, got1, err := m.GetByID(tt.args.ctx, tt.args.id)
+			got, got1, err := m.GetByID(context.Background(), tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("projectRepo.GetByID() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -100,15 +101,18 @@ func Test_projectRepo_GetByID(t *testing.T) {
 }
 
 func Test_projectRepo_getProjectMembers(t *testing.T) {
-	type fields struct {
-		DB *gorm.DB
+	t.Parallel()
+	testDB, _, cleanup := dbtest.CreateTestDatabase(t)
+	defer cleanup()
+	err := dbtest.MigrateTables(testDB)
+	if err != nil {
+		t.Fatalf("Failed to migrate table by error %v", err)
 	}
 	type args struct {
 		projectID models.UUID
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		want    []models.Member
 		wantErr bool
@@ -118,7 +122,7 @@ func Test_projectRepo_getProjectMembers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			m := &projectRepo{
-				DB: tt.fields.DB,
+				DB: testDB,
 			}
 			got, err := m.getProjectMembers(tt.args.projectID)
 			if (err != nil) != tt.wantErr {

@@ -46,4 +46,7 @@
 # Ignore all local history of files
 .history
 
+### ignore server binary file
+server
+
 # End of https://www.gitignore.io/api/go,linux,visualstudiocode
