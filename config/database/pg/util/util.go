@@ -65,5 +65,6 @@ func MigrateTables(db *gorm.DB) error {
 	return db.AutoMigrate(
 		models.Member{},
 		models.Project{},
+		models.Assignment{},
 	).Error
 }
