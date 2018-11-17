@@ -1,5 +1,7 @@
 ## Team management app
 
+Written in Golang, clean architecture, RESTful API.
+
 Time spent: 16h
 
 #### Prerequisite
@@ -15,6 +17,36 @@ Based on this article [Clean Architecture](https://blog.cleancoder.com/uncle-bob
 - `make local-db`: To create local database(port: 5432), test database(port:5439).
 - `make run`: To start server (default port is 8000).
 - `make unit-test`: To run test.
+
+### 3. List of API
+- **GET** `localhost:8000/projects/{id}`: return project with corresponding id.
+- **POST** `localhost:8000/projects/`: create new project, body request form:
+    ```json
+    {
+	    "project": {
+		    "name": "name of this project"
+	    }
+    }
+    ```
+
+- **POST**   `http://localhost:8000/members`: create new member, body request form:
+  ```json
+    {
+	    "member": {
+		    "name": "Trần Minh Luân",
+		    "phone": "+84332275305"
+	    }
+    }
+  ```
+- **POST**  `http://localhost:8000/members/assignments`: assign a member to project, body request form:
+  ```json
+    {
+	    "assignment": {
+		    "member_id": "f724f870-56c0-405a-82d0-da804d91bf99",
+		    "project_id": "111ae25e-59c5-4c5b-8e79-78eaadbd6d56"
+	    }
+    }
+  ```
 
 ### 3. To do 
 - [x] Add a member (name, phone).
