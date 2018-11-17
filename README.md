@@ -15,12 +15,12 @@ Based on this article [Clean Architecture](https://blog.cleancoder.com/uncle-bob
 - Install golang dependency management tool `go dep` by `go get -u github.com/golang/dep/cmd/dep`
 - `dep ensure`: install the project's dependencies.
 - `make local-db`: To create local database(port: 5432), test database(port:5439).
-- `make run`: To start server (default port is 8000).
+- `make run`: To start server (default port is 8000). Your server now available at **localhost:8000**
 - `make unit-test`: To run test.
 
 ### 3. List of API
-- **GET** `localhost:8000/projects/{id}`: return project with corresponding id.
-- **POST** `localhost:8000/projects/`: create new project, body request form:
+- **GET** `http://35.240.149.142:8080/projects/{uuidv4}`: return project with corresponding id.
+- **POST** `http://35.240.149.142:8080/projects/`: create new project, body request form:
     ```json
     {
 	    "project": {
@@ -29,7 +29,7 @@ Based on this article [Clean Architecture](https://blog.cleancoder.com/uncle-bob
     }
     ```
 
-- **POST**   `http://localhost:8000/members`: create new member, body request form:
+- **POST**   `http://35.240.149.142:8080/members`: create new member, body request form:
   ```json
     {
 	    "member": {
@@ -38,12 +38,12 @@ Based on this article [Clean Architecture](https://blog.cleancoder.com/uncle-bob
 	    }
     }
   ```
-- **POST**  `http://localhost:8000/members/assignments`: assign a member to project, body request form:
+- **POST**  `http://35.240.149.142:8080/members/assignments`: assign a member to project, body request form:
   ```json
     {
 	    "assignment": {
-		    "member_id": "f724f870-56c0-405a-82d0-da804d91bf99",
-		    "project_id": "111ae25e-59c5-4c5b-8e79-78eaadbd6d56"
+		    "member_id": "{uuidv4}",
+		    "project_id": "{uuidv4}"
 	    }
     }
   ```
